@@ -1,16 +1,10 @@
 package nl.iobyte.menuapi.item;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
+import java.util.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemBuilder {
 
@@ -28,8 +22,9 @@ public class ItemBuilder {
         item = new ItemStack(material, amount);
     }
 
-    public ItemBuilder(Material material, int amount, short data) {
-        item = new ItemStack(material, amount, data);
+    public ItemBuilder(Material material, int amount, int data) {
+        this(material, amount);
+        setCustomModelData(data);
     }
 
     public ItemStack getItem() {
@@ -44,10 +39,19 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setCustomModelData(int i) {
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            meta.setCustomModelData(i);
+            item.setItemMeta(meta);
+        });
+        return this;
+    }
+
     public ItemBuilder setUnbreakable(boolean b) {
-        ItemMeta meta = item.getItemMeta();
-        meta.setUnbreakable(b);
-        item.setItemMeta(meta);
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            meta.setUnbreakable(b);
+            item.setItemMeta(meta);
+        });
         return this;
     }
 
@@ -55,9 +59,10 @@ public class ItemBuilder {
         if(name == null)
             return this;
 
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(Color.parse(name));
-        this.item.setItemMeta(meta);
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            meta.setDisplayName(Color.parse(name));
+            this.item.setItemMeta(meta);
+        });
         return this;
     }
 
@@ -65,12 +70,13 @@ public class ItemBuilder {
         if(lore == null)
             return this;
 
-        ItemMeta meta = item.getItemMeta();
-        for(String string : lore)
-            lore.set(lore.indexOf(string), Color.parse(string));
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            for (String string : lore)
+                lore.set(lore.indexOf(string), Color.parse(string));
 
-        meta.setLore(lore);
-        item.setItemMeta(meta);
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+        });
         return this;
     }
 
@@ -82,52 +88,59 @@ public class ItemBuilder {
     }
 
     public ItemBuilder addLore(String lore) {
-        List<String> list = item.getItemMeta().getLore();
-        list.add(lore);
-        setLore(list);
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            List<String> list = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+            list.add(lore);
+            setLore(list);
+        });
         return this;
     }
 
     public ItemBuilder setEnchantment(HashMap<Enchantment, Integer> enchantments) {
-        ItemMeta meta = item.getItemMeta();
-        if(!meta.getEnchants().isEmpty())
-            meta.getEnchants().clear();
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            if (!meta.getEnchants().isEmpty())
+                meta.getEnchants().clear();
 
-        for(Map.Entry<Enchantment, Integer> entry : enchantments.entrySet())
-            meta.addEnchant(entry.getKey(), entry.getValue(), true);
+            for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet())
+                meta.addEnchant(entry.getKey(), entry.getValue(), true);
 
-        item.setItemMeta(meta);
+            item.setItemMeta(meta);
+        });
         return this;
     }
 
     public ItemBuilder setEnchantment(Enchantment enchantment, int i) {
-        ItemMeta meta = item.getItemMeta();
-        if (!meta.getEnchants().isEmpty())
-            meta.getEnchants().clear();
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            if (!meta.getEnchants().isEmpty())
+                meta.getEnchants().clear();
 
-        meta.addEnchant(enchantment, i, true);
-        item.setItemMeta(meta);
+            meta.addEnchant(enchantment, i, true);
+            item.setItemMeta(meta);
+        });
         return this;
     }
 
     public ItemBuilder addEnchantment(Enchantment enchantment, int i) {
-        ItemMeta meta = item.getItemMeta();
-        meta.addEnchant(enchantment, i, true);
-        item.setItemMeta(meta);
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            meta.addEnchant(enchantment, i, true);
+            item.setItemMeta(meta);
+        });
         return this;
     }
 
     public ItemBuilder addFlag(ItemFlag flag) {
-        ItemMeta meta = item.getItemMeta();
-        meta.addItemFlags(flag);
-        item.setItemMeta(meta);
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            meta.addItemFlags(flag);
+            item.setItemMeta(meta);
+        });
         return this;
     }
 
     public ItemBuilder addFlags(ItemFlag... flags) {
-        ItemMeta meta = item.getItemMeta();
-        meta.addItemFlags(flags);
-        item.setItemMeta(meta);
+        Optional.ofNullable(item.getItemMeta()).ifPresent(meta -> {
+            meta.addItemFlags(flags);
+            item.setItemMeta(meta);
+        });
         return this;
     }
 
